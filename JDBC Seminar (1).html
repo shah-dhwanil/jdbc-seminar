@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JDBC Seminar</title>
+<style>
+:root{color-scheme:light;--bg:#ffffff;--fg:#1f2430;--cd:#f4f5f8;--mut:#667085;--ac:#c4601c;--bl:#2f5fa8;--gr:#23845a;--rd:#c23b3b;--code:#1a1e29;--u:min(1vw,1.7vh);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:calc(var(--u)*2.2)}
+.s{display:none;position:absolute;inset:0;padding:calc(var(--u)*4) calc(var(--u)*7) calc(var(--u)*9);flex-direction:column;justify-content:center;gap:calc(var(--u)*3)}
+.s.on{display:flex}
+h1{font-size:calc(var(--u)*11);margin:0;line-height:1}
+h2{font-size:calc(var(--u)*4.4);margin:0;line-height:1.1}
+p{margin:0}.m{color:var(--mut)}.ac{color:var(--ac)}.bl{color:var(--bl)}.gr{color:var(--gr)}.rd{color:var(--rd)}
+.row{display:flex;gap:calc(var(--u)*2);align-items:stretch}
+.col{display:flex;flex-direction:column;gap:calc(var(--u)*1.5);align-items:stretch}
+.b{flex:1;background:var(--cd);border:1px solid #e3e6ec;border-radius:calc(var(--u)*1.2);padding:calc(var(--u)*1.8);font-weight:700;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:calc(var(--u)*.6)}
+.b small,.sm{font-size:calc(var(--u)*1.7);font-weight:400;color:var(--mut)}
+.f{background:var(--bl);color:#fff}.f small{color:#e4ecfb}
+.o{background:#fbe8d8;color:#5a2d0c}.o small{color:#7a4a25}
+.t{border-top:calc(var(--u)*.7) solid var(--bl)}.t.g{border-color:var(--gr)}.t.r{border-color:var(--rd)}.t.a{border-color:var(--ac)}
+.ar{align-self:center;font-size:calc(var(--u)*3.2);color:var(--ac);font-weight:700}
+.dn{align-self:center;color:var(--ac);font-size:calc(var(--u)*2.6);line-height:1}
+pre,.k{font-family:"Courier New",monospace}
+pre{background:var(--code);color:#f1eee6;padding:calc(var(--u)*2.2);border-radius:calc(var(--u)*1.2);margin:0;font-size:calc(var(--u)*2);line-height:1.5}
+.k{background:var(--code);color:#f1eee6;padding:.1em .45em;border-radius:6px;font-size:.88em;font-weight:400}
+pre .a{color:#f4a261}pre .c{color:#8fb8ff}pre .d{color:#8a93a6}
+table{border-collapse:collapse;font-size:calc(var(--u)*2.2)}td,th{padding:calc(var(--u)*.9) calc(var(--u)*2);border-bottom:2px solid var(--cd)}
+tr.cur td{background:#fbe8d8;color:#5a2d0c;font-weight:700}
+.nav{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:space-between;align-items:center;padding:calc(var(--u)*1.2) calc(var(--u)*3) calc(var(--u)*1.2 + env(safe-area-inset-bottom,0px))}
+.nav button{font:inherit;font-size:calc(var(--u)*2);background:var(--cd);color:var(--fg);border:0;border-radius:999px;padding:.4em 1.2em;cursor:pointer}
+.bar{position:fixed;left:0;top:0;height:5px;background:var(--ac);transition:width .2s}
+</style></head><body>
+<div class="bar" id="bar"></div>
+
+<section class="s on">
+<p class="ac" style="font-weight:700;letter-spacing:.1em">SEMESTER 5 SEMINAR</p>
+<h1>JDBC</h1>
+<p style="font-size:calc(var(--u)*3.4)">How Java talks to your database</p>
+<p class="m">[Your name] · [Course / Semester] · 30 min</p>
+</section>
+
+<section class="s">
+<h2>Two worlds, one gap</h2>
+<div class="row"><div class="b f">Java app<small>Core Java</small></div><div class="ar">⇄ ?</div><div class="b o">Database<small>DBMS + SQL</small></div></div>
+<p>Every database speaks its own protocol.</p>
+<p><b class="ac">JDBC</b> is the one standard way to bridge them.</p>
+</section>
+
+<section class="s">
+<h2>What is JDBC?</h2>
+<div class="row" style="align-items:center">
+<div class="col" style="flex:1.2"><div class="b f">Java application</div><div class="dn">↓</div><div class="b t">JDBC API<small>java.sql · javax.sql</small></div><div class="dn">↓</div><div class="b t a">JDBC Driver<small>vendor .jar, the "adapter"</small></div></div>
+<div class="ar">→</div>
+<div class="col" style="flex:.8"><div class="b o">MySQL</div><div class="b o">Oracle</div><div class="b o">PostgreSQL</div></div></div>
+<p class="m">Same code, any database: swap only the driver.</p>
+</section>
+
+<section class="s">
+<h2>Four driver types</h2>
+<div class="row">
+<div class="b t r">Type 1<small>JDBC-ODBC bridge</small><small class="rd">removed in Java 8</small></div>
+<div class="b t r">Type 2<small>Native API</small><small>needs native libs</small></div>
+<div class="b t r">Type 3<small>Network protocol</small><small>needs middleware</small></div>
+<div class="b t g">Type 4<small>Thin, pure Java</small><small class="gr">✓ use this</small></div></div>
+<p class="m">Examples: MySQL Connector/J, PostgreSQL JDBC.</p>
+</section>
+
+<section class="s">
+<h2>5 steps, every time</h2>
+<div class="row">
+<div class="b f">1<small style="color:#fff">Load driver</small></div><div class="ar">→</div>
+<div class="b f">2<small style="color:#fff">Connect</small></div><div class="ar">→</div>
+<div class="b f">3<small style="color:#fff">Create statement</small></div><div class="ar">→</div>
+<div class="b f">4<small style="color:#fff">Execute</small></div><div class="ar">→</div>
+<div class="b f">5<small style="color:#fff">Close</small></div></div>
+<div class="row sm" style="text-align:center"><div class="b" style="font-weight:400"><span class="k">Class.forName</span></div><div style="width:3em"></div><div class="b" style="font-weight:400"><span class="k">getConnection</span></div><div style="width:3em"></div><div class="b" style="font-weight:400"><span class="k">createStatement</span></div><div style="width:3em"></div><div class="b" style="font-weight:400"><span class="k">executeQuery</span></div><div style="width:3em"></div><div class="b" style="font-weight:400"><span class="k">close</span></div></div>
+<p class="m">Since JDBC 4, step 1 is automatic.</p>
+</section>
+
+<section class="s">
+<h2>First program</h2>
+<pre><span class="d">// 2 connect · 3 statement · 4 execute (auto-closed)</span>
+<span class="c">try</span> (Connection con = DriverManager.getConnection(<span class="a">url</span>, user, pass);
+     Statement st = con.createStatement();
+     ResultSet rs = st.executeQuery(<span class="a">"SELECT * FROM students"</span>)) {
+  <span class="c">while</span> (rs.next())
+    System.out.println(rs.getInt(<span class="a">"id"</span>) + <span class="a">" "</span> + rs.getString(<span class="a">"name"</span>));
+}</pre>
+<div class="row" style="align-items:center;flex-wrap:wrap"><span class="k">jdbc</span><span>:</span><span class="k" style="color:#f4a261">mysql</span><span>:</span><span class="k" style="color:#8fb8ff">//localhost:3306</span><span>/</span><span class="k">college</span><span class="m">&nbsp;protocol · database · host:port · schema</span></div>
+</section>
+
+<section class="s">
+<h2>The core objects</h2>
+<div class="row">
+<div class="b f"><span class="k">DriverManager</span><small>finds the driver</small></div><div class="ar">→</div>
+<div class="b f"><span class="k">Connection</span><small>session with the DB</small></div><div class="ar">→</div>
+<div class="b f"><span class="k">Statement</span><small>carries your SQL</small></div><div class="ar">→</div>
+<div class="b o"><span class="k">ResultSet</span><small>rows that come back</small></div></div>
+<p class="m">Each one creates the next.</p>
+</section>
+
+<section class="s">
+<h2>Statement: example with input data</h2>
+<pre style="font-size:calc(var(--u)*1.8)"><span class="c">String</span> name = <span class="a">"Ravi"</span>, pw = <span class="a">"pass123"</span>;   <span class="d">// input data</span>
+<span class="c">String</span> sql = <span class="a">"SELECT * FROM users "</span>
+    + <span class="a">"WHERE name='"</span> + name + <span class="a">"' AND pw='"</span> + pw + <span class="a">"'"</span>;
+<span class="c">try</span> (Statement st = con.createStatement();
+     ResultSet rs = st.executeQuery(sql)) {
+  <span class="c">if</span> (rs.next()) System.out.println(<span class="a">"Welcome "</span> + rs.getString(<span class="a">"name"</span>));
+  <span class="c">else</span> System.out.println(<span class="a">"Invalid login"</span>);
+}</pre>
+<p class="m">SQL sent to the DB: <span class="k">SELECT * FROM users WHERE name='Ravi' AND pw='pass123'</span></p>
+<p>Input is pasted into the SQL text. Works, but it is unsafe.</p>
+</section>
+
+<section class="s">
+<h2>Pick the right statement</h2>
+<div class="row">
+<div class="b t"><span class="k">Statement</span><small>Static SQL</small><small class="rd">injection risk</small></div>
+<div class="b t g"><span class="k">PreparedStatement</span><small>SQL with <b>?</b> parameters</small><small class="gr">safe + precompiled</small></div>
+<div class="b t a"><span class="k">CallableStatement</span><small>Stored procedures</small><small>{call proc(?)}</small></div></div>
+<p class="m">Default choice: <b class="gr">PreparedStatement</b>.</p>
+</section>
+
+<section class="s">
+<h2>SQL injection</h2>
+<p class="m">Login input: <span class="k">' OR '1'='1</span></p>
+<div class="row" style="align-items:center">
+<div class="b t r" style="text-align:left"><span class="rd">Concatenated SQL</span><pre style="font-size:calc(var(--u)*1.7)">WHERE name='' OR '1'='1'</pre><small>condition is always true → logs in as anyone</small></div>
+<div class="ar">vs</div>
+<div class="b t g" style="text-align:left"><span class="gr">PreparedStatement</span><pre style="font-size:calc(var(--u)*1.7)">WHERE name=?   ← bound as data</pre><small>input is just a string → no match</small></div></div>
+</section>
+
+<section class="s">
+<h2>PreparedStatement: same example, now safe</h2>
+<pre style="font-size:calc(var(--u)*1.8)"><span class="c">String</span> name = <span class="a">"Ravi"</span>, pw = <span class="a">"pass123"</span>;   <span class="d">// same input data</span>
+<span class="c">String</span> sql = <span class="a">"SELECT * FROM users WHERE name=? AND pw=?"</span>;
+<span class="c">try</span> (PreparedStatement ps = con.prepareStatement(sql)) {
+  ps.setString(<span class="a">1</span>, name);
+  ps.setString(<span class="a">2</span>, pw);
+  <span class="c">try</span> (ResultSet rs = ps.executeQuery()) {
+    <span class="c">if</span> (rs.next()) System.out.println(<span class="a">"Welcome "</span> + rs.getString(<span class="a">"name"</span>));
+    <span class="c">else</span> System.out.println(<span class="a">"Invalid login"</span>);
+  }
+}</pre>
+<div class="row"><div class="b t"><small>1. SQL with <b>?</b> is sent and precompiled</small></div><div class="b t"><small>2. <span class="k">setString</span> binds values (1-based index)</small></div><div class="b t g"><small class="gr">3. Input can never change the SQL</small></div></div>
+</section>
+
+<section class="s">
+<h2>ResultSet: a moving cursor</h2>
+<div class="row" style="align-items:center">
+<table><tr><th></th><th>id</th><th>name</th></tr>
+<tr><td class="m">before first</td><td></td><td></td></tr>
+<tr><td>▶</td><td>1</td><td>Asha</td></tr>
+<tr class="cur"><td>▶ now</td><td>2</td><td>Ravi</td></tr>
+<tr><td></td><td>3</td><td>Meera</td></tr></table>
+<table style="font-size:calc(var(--u)*1.8)">
+<tr><th>Topic</th><th>Details</th></tr>
+<tr><td><b>Move</b></td><td><span class="k">next()</span> <span class="k">previous()</span> <span class="k">first()</span> <span class="k">last()</span> <span class="k">absolute(n)</span></td></tr>
+<tr><td><b>Read</b></td><td><span class="k">getInt("id")</span> or <span class="k">getString(2)</span>: by name or 1-based index</td></tr>
+<tr><td><b>Type</b></td><td>FORWARD_ONLY (default), SCROLL_INSENSITIVE, SCROLL_SENSITIVE</td></tr>
+<tr><td><b>Update</b></td><td>CONCUR_UPDATABLE: <span class="k">updateString()</span> then <span class="k">updateRow()</span></td></tr>
+<tr><td><b>Describe</b></td><td><span class="k">getMetaData()</span>: column count, names, types</td></tr>
+<tr><td><b>Watch out</b></td><td><span class="k">wasNull()</span> for SQL NULL; close it (try-with-resources)</td></tr></table></div>
+</section>
+
+<section class="s">
+<h2>Which method runs what?</h2>
+<div class="row" style="align-items:center"><div class="b">SELECT</div><div class="ar">→</div><div class="b f"><span class="k">executeQuery()</span></div><div class="ar">→</div><div class="b o">ResultSet</div></div>
+<div class="row" style="align-items:center"><div class="b">INSERT · UPDATE · DELETE</div><div class="ar">→</div><div class="b f"><span class="k">executeUpdate()</span></div><div class="ar">→</div><div class="b o">rows affected (int)</div></div>
+<p class="m">Many rows at once? Batch operations are next.</p>
+</section>
+
+<section class="s">
+<h2>Batch operations: group the work</h2>
+<div class="row">
+<div class="b t r"><span class="rd">One by one</span><small>Java → DB, 1000 times</small><span class="ac" style="letter-spacing:.2em">→ → → → → → →</span><small>1000 network round trips</small></div>
+<div class="b t g"><span class="gr">Batch</span><small><span class="k">addBatch()</span> ×1000 (kept in memory)</small><span class="dn">↓</span><small><span class="k">executeBatch()</span> sends all together</small><small>1 round trip</small></div></div>
+<div class="row"><div class="b"><small>Works with <b>Statement</b> and <b>PreparedStatement</b></small></div><div class="b"><small>INSERT · UPDATE · DELETE only, no SELECT</small></div><div class="b"><small>Returns <span class="k">int[]</span>: count per statement</small></div></div>
+</section>
+
+<section class="s">
+<h2>Batch example: insert many students</h2>
+<pre style="font-size:calc(var(--u)*1.8)">con.setAutoCommit(<span class="c">false</span>);   <span class="d">// all rows succeed or none</span>
+<span class="c">String</span> sql = <span class="a">"INSERT INTO students(id, name) VALUES (?, ?)"</span>;
+<span class="c">try</span> (PreparedStatement ps = con.prepareStatement(sql)) {
+  ps.setInt(1, 101); ps.setString(2, <span class="a">"Asha"</span>);  ps.addBatch();
+  ps.setInt(1, 102); ps.setString(2, <span class="a">"Ravi"</span>);  ps.addBatch();
+  ps.setInt(1, 103); ps.setString(2, <span class="a">"Meera"</span>); ps.addBatch();
+  <span class="c">int</span>[] counts = ps.executeBatch();   <span class="d">// one trip to the DB</span>
+  con.commit();
+}</pre>
+<p class="m">Tip: in a real loop, call <span class="k">executeBatch()</span> every 500 to 1000 rows. On failure, catch <span class="k">BatchUpdateException</span> and rollback.</p>
+</section>
+
+<section class="s">
+<h2>Transactions: all or nothing</h2>
+<div class="row" style="align-items:center">
+<div class="b"><span class="k">setAutoCommit(false)</span></div><div class="ar">→</div>
+<div class="b">debit A<small>−500</small></div><div class="ar">→</div>
+<div class="b">credit B<small>+500</small></div><div class="ar">→</div>
+<div class="col" style="flex:1"><div class="b t g"><span class="k">commit()</span><small>both worked</small></div><div class="b t r"><span class="k">rollback()</span><small>any failure</small></div></div></div>
+<p class="m">ACID from your DBMS course, now in Java code.</p>
+</section>
+
+<section class="s">
+<h2>Connection pooling</h2>
+<div class="row">
+<div class="b t r"><span class="rd">Without a pool</span><small>open → query → close</small><small>on every request: slow</small></div>
+<div class="b t g"><span class="gr">With a pool</span><small>● ● ● ● ready connections</small><small>borrow → use → return</small></div></div>
+<p class="m">Use <span class="k">DataSource</span> with HikariCP or Apache DBCP.</p>
+</section>
+
+<section class="s">
+<h2>Where JDBC fits</h2>
+<div class="col" style="max-width:calc(var(--u)*70)">
+<div class="b o">Hibernate / JPA<small>maps objects to tables</small></div>
+<div class="b o">Spring JdbcTemplate<small>less boilerplate</small></div>
+<div class="b f">JDBC<small>the foundation</small></div>
+<div class="b">Database</div></div>
+<p class="m">Learn JDBC first: every framework above runs on it.</p>
+</section>
+
+<section class="s">
+<h2>Do and don't</h2>
+<div class="row">
+<div class="b t g" style="text-align:left;align-items:flex-start"><span class="gr">Do</span><p>PreparedStatement</p><p>try-with-resources</p><p>Pool connections</p><p>Commit or rollback</p></div>
+<div class="b t r" style="text-align:left;align-items:flex-start"><span class="rd">Don't</span><p>Concatenate SQL</p><p>Hardcode passwords</p><p>Leave connections open</p><p>Ignore SQLException</p></div></div>
+</section>
+
+<section class="s">
+<h2>Go deeper</h2>
+<div class="col" style="font-size:calc(var(--u)*2)">
+<p><b class="bl">Oracle</b> The Java Tutorials: JDBC Database Access</p>
+<p><b class="bl">Book</b> Core Java Vol. II, Cay Horstmann (JDBC chapter)</p>
+<p><b class="bl">Book</b> Database System Concepts, Silberschatz et al.</p>
+<p><b class="bl">Docs</b> java.sql API · MySQL Connector/J · PostgreSQL JDBC</p>
+<p><b class="bl">Pooling</b> HikariCP README</p>
+<p><b class="bl">Spring</b> JdbcTemplate reference</p>
+<p><b class="bl">Tutorials</b> Baeldung · GeeksforGeeks · Jenkov</p></div>
+<p class="ac" style="font-size:calc(var(--u)*3.4);font-weight:700">Questions?</p>
+</section>
+
+<div class="nav"><button id="p">←</button><span class="m" id="n"></span><button id="x">→</button></div>
+<script>
+var S=[].slice.call(document.querySelectorAll('.s')),i=0;
+function go(k){i=Math.max(0,Math.min(S.length-1,k));S.forEach(function(s,j){s.classList.toggle('on',j===i)});
+document.getElementById('n').textContent=(i+1)+' / '+S.length;
+document.getElementById('bar').style.width=((i+1)/S.length*100)+'%'}
+document.getElementById('p').onclick=function(){go(i-1)};
+document.getElementById('x').onclick=function(){go(i+1)};
+document.addEventListener('keydown',function(e){if(e.key==='ArrowRight'||e.key===' '||e.key==='PageDown')go(i+1);if(e.key==='ArrowLeft'||e.key==='PageUp')go(i-1)});
+var X0=null;document.addEventListener('touchstart',function(e){X0=e.touches[0].clientX});
+document.addEventListener('touchend',function(e){if(X0===null)return;var d=e.changedTouches[0].clientX-X0;if(Math.abs(d)>50)go(i+(d<0?1:-1));X0=null});
+go(0);
+</script>
+</body></html>
