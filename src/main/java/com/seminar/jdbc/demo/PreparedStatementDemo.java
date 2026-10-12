@@ -64,10 +64,10 @@ public final class PreparedStatementDemo {
                 long id = keys.next() ? keys.getLong(1) : -1;
                 System.out.println("executeUpdate(INSERT) -> " + rows + " row(s), generated id=" + id);
             }
-            try (PreparedStatement del = con.prepareStatement("DELETE FROM users WHERE username = ?")) {
-                del.setString(1, demoUser);
-                System.out.println("cleanup DELETE -> " + del.executeUpdate() + " row(s).");
-            }
+            // try (PreparedStatement del = con.prepareStatement("DELETE FROM users WHERE username = ?")) {
+            //     del.setString(1, demoUser);
+            //     System.out.println("cleanup DELETE -> " + del.executeUpdate() + " row(s).");
+            // }
         } catch (SQLException e) {
             SqlErrors.print(e);
         }

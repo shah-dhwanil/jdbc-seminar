@@ -48,7 +48,9 @@ public final class TransactionDemo {
         boolean ok = transfer(1, 2, okAmount);
         System.out.println("transfer " + okAmount + " -> " + (ok ? "COMMITTED." : "ROLLED BACK."));
         printBalances("after success");
-
+        System.out.println("-------------------------------------------");
+        System.out.println("Now transfering  "+failAmount);
+        printBalances("before");
         boolean bad = transfer(1, 2, failAmount);
         System.out.println("transfer " + failAmount + " -> "
                 + (bad ? "COMMITTED (unexpected!)." : "ROLLED BACK (balances unchanged)."));
@@ -85,7 +87,7 @@ public final class TransactionDemo {
                 return true;
             } catch (SQLException e) {
                 con.rollback(); // <-- the whole point: debit is undone too
-                System.out.println("  rolled back: " + e.getMessage());
+                System.out.println(" rolled back: " + e.getMessage());
                 return false;
             } finally {
                 con.setAutoCommit(true);

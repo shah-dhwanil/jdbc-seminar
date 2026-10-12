@@ -40,7 +40,7 @@ public final class SqlInjectionDemo {
                 + user + "' AND password='" + pass + "'";
         System.out.println("[vulnerable] SQL sent to DB:\n  " + vulnSql);
         System.out.println("[vulnerable] your input rows: " + countWithStatement(vulnSql));
-
+        System.out.println("---------------------------------------------");
         // B) Canned attack string, always demonstrates the hole on stage.
         // The trailing "-- " comments out the password check, so the OR makes
         // the WHERE clause true for EVERY row. (Without it, AND binds tighter
@@ -53,7 +53,7 @@ public final class SqlInjectionDemo {
         int evilRows = countWithStatement(evilSql);
         System.out.println("[vulnerable] attack matched " + evilRows
                 + " row(s) -> " + (evilRows > 0 ? "LOGGED IN AS SOMEONE ELSE (injection!)" : "rejected"));
-
+        System.out.println("---------------------------------------------");
         // C) Same evil input through a placeholder: treated as data, never code.
         String safeSql = "SELECT id, username FROM users WHERE username=? AND password=?";
         int safeRows = 0;
